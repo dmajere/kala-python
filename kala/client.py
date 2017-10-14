@@ -10,11 +10,11 @@ from kala.exceptions import (
 class Client(object):
 
     def __init__(self, server,
-                 timeout=30, version="v1", quite=False):
+                 timeout=30, version="v1", quiet=False):
         self.server = server
         self.timeout = timeout
         self.version = version
-        self.quite = quite
+        self.quiet = quiet
 
     @staticmethod
     def _parse_response(response, clazz, resource_name=None, nested=False):
@@ -47,10 +47,10 @@ class Client(object):
             response = requests.request(
                 method, url, params=params, data=data,
                 headers=headers, timeout=self.timeout)
-            if not self.quite:
+            if not self.quiet:
                 kala.log.debug('Got response while calling {0}'.format(url))
         except requests.exceptions.RequestException as e:
-            if not self.quite:
+            if not self.quiet:
                 kala.log.error('Error while calling {url}: {error}'.format(
                     url=url, error=e.message))
             raise e
@@ -58,12 +58,12 @@ class Client(object):
         if response is None:
             raise KalaError("Invalid response from kala api")
         if response.status_code >= 500:
-            if not self.quite:
+            if not self.quiet:
                 kala.log.error('Got HTTP {code}: {body}'.format(
                     code=response.status_code, body=response.text))
             raise InternalServerError(response)
         elif response.status_code >= 400:
-            if not self.quite:
+            if not self.quiet:
                 kala.log.error('Got HTTP {code}: {body}'.format(
                     code=response.status_code, body=response.text))
             if response.status_code == 404:
@@ -71,11 +71,11 @@ class Client(object):
             else:
                 raise HttpError(response)
         elif response.status_code >= 300:
-            if not self.quite:
+            if not self.quiet:
                 kala.log.warn('Got HTTP {code}: {body}'.format(
                     code=response.status_code, body=response.text))
         else:
-            if not self.quite:
+            if not self.quiet:
                 kala.log.debug('Got HTTP {code}: {body}'.format(
                     code=response.status_code, body=response.text))
 
